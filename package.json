@@ -1,0 +1,14 @@
+{
+  "name": "restify-validation-engine",
+  "version": "1.0.0",
+  "description": "Customisable validator middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "PlatypusMeister (Paul Varache)",
+  "license": "ISC",
+  "dependencies": {
+    "validator": "^3.40.1"
+  }
+}
