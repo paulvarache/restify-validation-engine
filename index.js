@@ -4,8 +4,10 @@ function checkScope (validate, scope) {
 
     var errors = [];
 
+    // Lopp through fields
     for (var fieldName in validate) {
 
+        // Check the validity of the field
         var fieldError = checkField(validate[fieldName], scope[fieldName], fieldName);
         if (fieldError) {
             errors.push({
@@ -23,44 +25,55 @@ function checkField (checks, field, fieldName) {
 
     var params = [];
 
+    // Stop the check if the field is not required and not here
     if (!checks.required && !validator.required(field)) {
         return null;
     }
 
+    // Loop through the checks
     for (var key in checks) {
 
+        // Extract the params (if defined)
         params = checks[key].params ? checks[key].params.slice() : [];
+        // Add the field as the first param
         params.unshift(field);
+
+        // Run the validation with the params and if it fails
         if (!validator[key].apply(validator, params)) {
-            if (checks[key].message) {
-                return checks[key].msg;
+            // The message is the value of the fields check
+            if (typeof checks[key] === 'string') {
+                return checks[key];
             }
-            return 'The parameter `' + fieldName + '` did not pass the `' + key + ' test';
+            // We return a generic error
+            return 'The parameter `' + fieldName + '` did not pass the `' + key + '` test';
         }
-
     }
-
     return null;
 }
 
 module.exports = function (options) {
+    options = options || {};
+    options.customValidators = options.customValidators || {};
 
+    // Add a `required` validator
     validator.extend('required', function (field) {
         return !!field && field !== '';
     });
 
+    // Add all the custom validators
     for (var key in options.customValidators) {
         validator[key] = options.customValidators[key].bind(validator);
     }
 
-    return function (req, res, next) {
+    var scopes = options.scopes || ['params', 'body'];
 
-        var scopes = options.scopes || ['params', 'body'];
+    return function (req, res, next) {
 
         req.body = req.body || {};
         var errors  = [];
         if (req.route && req.route.validate) {
 
+            // Chek every scope
             scopes.forEach(function (scope) {
                 if (req.route.validate[scope]) {
                     var scopeErrors = checkScope(req.route.validate[scope], req[scope]).map(function (scopeError) {
@@ -73,6 +86,7 @@ module.exports = function (options) {
 
         }
 
+        // Return the errors if any otherwise go to the next middleware
         if (errors.length) {
             res.send(400, {
                 status: 'error',
