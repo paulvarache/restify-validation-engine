@@ -5,11 +5,11 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/paulvarache/restify-valitaion-engine.git"  
+    "url": "https://github.com/paulvarache/restify-valitaion-engine.git"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha",
-    "coverage-ci": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/instanbul report clover"
+    "coverage-ci": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/istanbul report clover"
   },
   "author": "PlatypusMeister (Paul Varache)",
   "license": "ISC",
