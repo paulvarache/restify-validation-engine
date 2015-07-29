@@ -54,6 +54,12 @@ function checkField (checks, field, fieldName) {
 module.exports = function (options) {
     options = options || {};
     options.customValidators = options.customValidators || {};
+    options.formatter = options.formatter || function (errors) {
+        if (Array.isArray(errors)) {
+            return { errors: errors };
+        }
+        return errors;
+    };
 
     // Add a `required` validator
     validator.extend('required', function (field) {
@@ -88,10 +94,9 @@ module.exports = function (options) {
 
         // Return the errors if any otherwise go to the next middleware
         if (errors.length) {
-            res.send(400, {
-                status: 'error',
-                errors: errors
-            });
+            var formatter = req.route.validate.formatter || options.formatter;
+            var body = options.multipleErrors ? errors : errors[0];
+            res.send(400, formatter(body));
         } else {
             next();
         }

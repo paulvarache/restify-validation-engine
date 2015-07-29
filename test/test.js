@@ -1,19 +1,10 @@
 var restify = require('restify'),
     request = require('request'),
     restifyValidator = require('../'),
-    should = require('should'),
-    server;
-
-describe('Default options', function () {
-    it('should not crash when no options is given', function () {
-        restifyValidator();
-    });
-    it('should not crash when no customValidator is given', function () {
-        restifyValidator({});
-    });
-});
+    should = require('should');
 
 describe('restify-validation-engine module', function () {
+    var server;
     before(function (done) {
         server = restify.createServer({
             name: 'test'
@@ -92,16 +83,14 @@ describe('restify-validation-engine module', function () {
 
         server.listen(4444, done);
     });
-    it ('should return 3 errors', function (done) {
+    it ('should return one error', function (done) {
         request({
             uri: 'http://localhost:4444/test01',
             method: "POST",
             json: true
         }, function (error, response, body) {
             should.not.exist(error);
-            should.exist(body.errors);
-            body.errors.should.lengthOf(3);
-            console.log(body);
+            Object.keys(body).should.lengthOf(3);
             done();
         });
     });
@@ -130,11 +119,9 @@ describe('restify-validation-engine module', function () {
             json: true
         }, function (error, response, body) {
             should.not.exist(error);
-            should.exist(body.errors);
-            body.errors.should.lengthOf(1);
-            body.errors[0].scope.should.be.eql('body');
-            body.errors[0].field.should.be.eql('password');
-            body.errors[0].message.should.be.eql('Password is required');
+            body.scope.should.be.eql('body');
+            body.field.should.be.eql('password');
+            body.message.should.be.eql('Password is required');
             done();
         });
     });
@@ -145,9 +132,7 @@ describe('restify-validation-engine module', function () {
             json: true
         }, function (error, response, body) {
             should.not.exist(error);
-            should.exist(body.errors);
-            body.errors.should.lengthOf(1);
-            body.errors[0].message.should.be.eql('The parameter `filter` did not pass the `required` test');
+            body.message.should.be.eql('The parameter `filter` did not pass the `required` test');
             done();
         });
     });
@@ -158,11 +143,9 @@ describe('restify-validation-engine module', function () {
             json: true
         }, function (error, response, body) {
             should.not.exist(error);
-            should.exist(body.errors);
-            body.errors.should.lengthOf(1);
-            body.errors[0].scope.should.be.eql('params');
-            body.errors[0].field.should.be.eql('email');
-            body.errors[0].message.should.be.eql('The email address must be valid');
+            body.scope.should.be.eql('params');
+            body.field.should.be.eql('email');
+            body.message.should.be.eql('The email address must be valid');
             done();
         });
     });
@@ -176,7 +159,7 @@ describe('restify-validation-engine module', function () {
             done();
         });
     });
-    it('should not be ok', function (done) {
+    it('should be ok', function (done) {
         request({
             uri: 'http://localhost:4444/test04',
             method: 'GET'

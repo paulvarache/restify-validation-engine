@@ -14,7 +14,10 @@ npm install restify-validation-engine
 
 ## Load it
 
-Then you can load it as a simple middleware. You can add your own validators in the `customValidators` key of the options.
+Then you can load it as a simple middleware.
+  * You can add your own validators in the `customValidators` key of the options.
+  * You can specify if you want a list of error or just one with `multipleErrors`.
+  * You can change the way the error looks with the `formatter`.
 
 ```js
 var restify = require('restify'),
@@ -29,6 +32,17 @@ server.use(restifyValidator({
     customValidators: {
         myValidator: function (value) {
             // Here put your custom validation and return true for valid or false
+        },
+        multipleErrors: false // True if you want a list as result
+        formatter: function (errors) {
+            // errors can be an array or an object depending on `multipleErrors`
+            if (!Array.isArray(errors)) {
+                return errors;
+            }
+            return {
+                status: 'error',
+                errors: errors
+            };
         }
     }
 }));
@@ -51,6 +65,26 @@ server.get({
     }
 });
 ```
+
+You can also add a `formatter` to the validate object for a route specific format. This will override the default formatter
+
+```js
+server.get({
+    url: '/my-url',
+    validate: { // Entry point of the module
+        params: { // Which scope
+            ...
+        },
+        formatter: function (errors) {
+            return {
+                name: 'my custom format',
+                errors: errors
+            }
+        }
+    }
+});
+```
+
 In the validate key of the route you can define your fields in the `params` or `body` key.
 Each field can have a set of validators. The validators available are the `required` validator,
 every validator from the (validator)[https://github.com/chriso/validator.js] module and your custom ones.
@@ -107,17 +141,10 @@ Now that your validation engine is in place, you will get a response like this w
 
 ```json
 {
-    status: 'error',
-    errors: [{
-        message: 'The filter param must be one of these values: small, normal, big',
-        field: 'filter',
-        scope: 'params'
-    },
-    {
-        message: 'The parameter `email` did not pass the `required` test',
-        field: 'email',
-        scope: 'body'
-    }]
+        "message": "The filter param must be one of these values: small, normal, big",
+        "field": "filter",
+        "scope": "params",
+        "given": ""
 }
 ```
 
