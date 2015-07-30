@@ -10,11 +10,15 @@ function checkScope (validate, scope) {
         // Check the validity of the field
         var fieldError = checkField(validate[fieldName], scope[fieldName], fieldName);
         if (fieldError) {
-            errors.push({
-                message: fieldError,
-                field: fieldName,
-                given: scope[fieldName]
-            });
+            if (fieldError instanceof Error) {
+                errors.push(fieldError);
+            } else {
+                errors.push({
+                    message: fieldError,
+                    field: fieldName,
+                    given: scope[fieldName]
+                });
+            }
         }
 
     }
@@ -41,7 +45,7 @@ function checkField (checks, field, fieldName) {
         // Run the validation with the params and if it fails
         if (!validator[key].apply(validator, params)) {
             // The message is the value of the fields check
-            if (typeof checks[key] === 'string') {
+            if (typeof checks[key] === 'string' || checks[key] instanceof Error) {
                 return checks[key];
             }
             // We return a generic error
@@ -96,9 +100,12 @@ module.exports = function (options) {
         if (errors.length) {
             var formatter = req.route.validate.formatter || options.formatter;
             var body = options.multipleErrors ? errors : errors[0];
-            res.send(400, formatter(body));
+            if (!body.length && body instanceof Error) {
+                return next(body);
+            }
+            return res.send(400, formatter(body));
         } else {
-            next();
+            return next();
         }
     };
 };
