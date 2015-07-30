@@ -91,6 +91,7 @@ every validator from the (validator)[https://github.com/chriso/validator.js] mod
 A validator can be set to:
   * true/false
   * a custom error message
+  * an Error object
   * an object with:
     * `msg` a custom error message
     * `params` when the validator need some
@@ -111,8 +112,11 @@ server.post({
         },
         body: {
             email: { // The field to validate
-                required: true // A validator
+                required: true, // A validator
                 isEmail: "The mail is required" // This string will be used as a custom error message
+            },
+            password: {
+                required: new restify.BadRequestError('Password is required')
             }
         }
     }
