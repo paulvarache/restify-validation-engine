@@ -1,6 +1,6 @@
 {
   "name": "restify-validation-engine",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Customisable validator middleware",
   "main": "index.js",
   "repository": {
@@ -13,6 +13,12 @@
   },
   "author": "PlatypusMeister (Paul Varache)",
   "license": "ISC",
+  "keywords": [
+    "restify",
+    "middleware",
+    "validate",
+    "error"
+  ],
   "dependencies": {
     "validator": "^3.40.1"
   },

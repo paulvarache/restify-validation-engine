@@ -32,18 +32,18 @@ server.use(restifyValidator({
     customValidators: {
         myValidator: function (value) {
             // Here put your custom validation and return true for valid or false
-        },
-        multipleErrors: false // True if you want a list as result
-        formatter: function (errors) {
-            // errors can be an array or an object depending on `multipleErrors`
-            if (!Array.isArray(errors)) {
-                return errors;
-            }
-            return {
-                status: 'error',
-                errors: errors
-            };
         }
+    },
+    multipleErrors: false // True if you want a list as result
+    formatter: function (errors) {
+        // errors can be an array or an object depending on `multipleErrors`
+        if (!Array.isArray(errors)) {
+            return errors;
+        }
+        return {
+            status: 'error',
+            errors: errors
+        };
     }
 }));
 
