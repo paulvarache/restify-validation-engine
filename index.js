@@ -47,7 +47,10 @@ function checkField (checks, field, fieldName) {
             // The message is the value of the fields check
             if (typeof checks[key] === 'string' || checks[key] instanceof Error) {
                 return checks[key];
+            } else if (Object.prototype.hasOwnProperty.call(checks[key], 'msg')) {
+                return checks[key].msg;
             }
+            
             // We return a generic error
             return 'The parameter `' + fieldName + '` did not pass the `' + key + '` test';
         }
